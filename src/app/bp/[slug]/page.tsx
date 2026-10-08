@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
@@ -45,11 +46,11 @@ export default async function BlueprintDetail({
     <div className="max-w-4xl mx-auto p-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1 text-xs text-zinc-400 mb-4 flex-wrap">
-        <a href="/" className="hover:text-zinc-900">Home</a>
+        <Link href="/" className="hover:text-zinc-900">Home</Link>
         {breadcrumbs.map((b) => (
           <span key={b.slug} className="flex items-center gap-1">
             <span>›</span>
-            <a href={`/bp/${b.slug}`} className="hover:text-zinc-900">{b.judul}</a>
+            <Link href={`/bp/${b.slug}`} className="hover:text-zinc-900">{b.judul}</Link>
           </span>
         ))}
         <span>›</span>
@@ -74,6 +75,7 @@ export default async function BlueprintDetail({
         <div className="flex gap-2">
           <a
             href={`/api/bp/${bp.slug}`}
+            target="_blank"
             className="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg hover:bg-zinc-50 font-mono"
           >
             JSON
@@ -99,14 +101,14 @@ export default async function BlueprintDetail({
           <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">Sub-blueprint</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {bp.children.map((c) => (
-              <a
+              <Link
                 key={c.slug}
                 href={`/bp/${c.slug}`}
                 className="flex items-center justify-between px-3 py-2 bg-white border border-zinc-200 rounded-lg hover:border-zinc-300"
               >
                 <span className="text-sm font-medium">{c.judul}</span>
                 <span className="text-xs text-zinc-400">→</span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>

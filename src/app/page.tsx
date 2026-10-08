@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
 export const instant = false
@@ -49,7 +50,7 @@ export default async function Home() {
         {roots.map((bp) => {
           const tags: string[] = JSON.parse(bp.tag)
           return (
-            <a
+            <Link
               key={bp.id}
               href={`/bp/${bp.slug}`}
               className="bg-white border border-zinc-200 rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 transition-all"
@@ -95,7 +96,7 @@ export default async function Home() {
                 </span>
                 <span className="text-xs text-zinc-600">Buka →</span>
               </div>
-            </a>
+            </Link>
           )
         })}
       </div>
