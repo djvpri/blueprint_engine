@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint Engine — Dense Tool</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+  .row:hover { background: #18181b; }
+  .badge { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 500; }
+  .section-card { border: 1px solid #27272a; border-radius: 6px; }
+  .md code { background: #27272a; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; color: #a1a1aa; }
+  .md pre { background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 12px; overflow-x: auto; font-size: 12px; color: #d4d4d8; }
+  .md p { color: #a1a1aa; line-height: 1.5; margin: 4px 0; }
+  .md ul { margin: 4px 0; padding-left: 16px; }
+  .md li { color: #a1a1aa; margin: 2px 0; }
+</style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 text-sm">
+
+<div class="flex h-screen">
+
+  <!-- Left: Flat list (no tree, dense table) -->
+  <aside class="w-80 border-r border-zinc-800 flex flex-col">
+    <div class="px-3 py-2 border-b border-zinc-800 flex items-center justify-between">
+      <span class="font-semibold text-zinc-100 text-xs uppercase tracking-wide">Blueprints</span>
+      <span class="text-[10px] text-zinc-500">12 total</span>
+    </div>
+
+    <div class="px-2 py-1.5 border-b border-zinc-800">
+      <input type="text" placeholder="filter..." class="w-full px-2 py-1 text-xs bg-zinc-900 border border-zinc-800 rounded text-zinc-300 outline-none focus:border-zinc-600">
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      <!-- Group: ZPos Kasir -->
+      <div class="px-2 py-1 border-b border-zinc-900">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide px-1 py-1">ZPos Kasir</div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Sync Engine</span>
+          <span class="badge bg-emerald-900 text-emerald-400 ml-auto">aktif</span>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2 bg-zinc-800">
+          <span class="text-zinc-500">▾</span>
+          <span class="text-zinc-100">Incremental Sync</span>
+          <span class="badge bg-emerald-900 text-emerald-400 ml-auto">aktif</span>
+        </div>
+        <div class="ml-4">
+          <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2 text-zinc-500">
+            <span>↳</span>
+            <span>Retry & Cooldown</span>
+          </div>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Log Kasir</span>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Struk Thermal</span>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Multi-tenant Auth</span>
+        </div>
+      </div>
+
+      <div class="px-2 py-1 border-b border-zinc-900">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide px-1 py-1">ZX Parenting</div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Auth Anak (PIN)</span>
+          <span class="badge bg-emerald-900 text-emerald-400 ml-auto">aktif</span>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Tugas & Reward</span>
+        </div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Leaderboard</span>
+        </div>
+      </div>
+
+      <div class="px-2 py-1">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide px-1 py-1">ZGym</div>
+        <div class="row px-2 py-1 rounded cursor-pointer text-xs flex items-center gap-2">
+          <span class="text-zinc-600">▸</span>
+          <span class="text-zinc-300">Member Pricing</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-2 border-t border-zinc-800">
+      <button class="w-full px-2 py-1.5 text-xs bg-zinc-800 text-zinc-300 rounded hover:bg-zinc-700 border border-zinc-700">+ New</button>
+    </div>
+  </aside>
+
+  <!-- Center: Content -->
+  <main class="flex-1 overflow-y-auto">
+    <!-- Top bar -->
+    <div class="px-4 py-2 border-b border-zinc-800 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-1 text-zinc-500">
+        <span class="hover:text-zinc-300 cursor-pointer">zpos-kasir</span>
+        <span>/</span>
+        <span class="hover:text-zinc-300 cursor-pointer">sync-engine</span>
+        <span>/</span>
+        <span class="text-zinc-100">incremental-sync</span>
+      </div>
+      <div class="flex gap-1">
+        <button class="px-2 py-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded text-xs">Edit</button>
+        <button class="px-2 py-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded text-xs">+ Sub</button>
+        <button class="px-2 py-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded text-xs mono">API</button>
+      </div>
+    </div>
+
+    <!-- Meta bar -->
+    <div class="px-4 py-2 border-b border-zinc-800 flex items-center gap-2 text-[10px]">
+      <span class="badge bg-emerald-900 text-emerald-400">AKTIF</span>
+      <span class="badge bg-zinc-800 text-zinc-400">mobile</span>
+      <span class="badge bg-zinc-800 text-zinc-400">rust</span>
+      <span class="badge bg-zinc-800 text-zinc-400">tauri</span>
+      <span class="text-zinc-600 ml-auto">v0.1.134 · Updated 2h ago</span>
+    </div>
+
+    <!-- Title -->
+    <div class="px-4 py-4 border-b border-zinc-800">
+      <h1 class="text-lg font-bold text-zinc-100">Incremental Sync</h1>
+      <p class="text-xs text-zinc-500 mt-0.5">Sinkronisasi produk incremental — hanya download yang berubah sejak timestamp terakhir.</p>
+    </div>
+
+    <!-- Sections as stacked cards -->
+    <div class="p-4 space-y-3">
+      <div class="section-card p-3">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-2">Ringkasan</div>
+        <div class="md text-xs">
+          <p>Modul <code>sync.rs</code> handle sinkronisasi produk. Sebelumnya: download ALL 7505 produk. Sekarang: hanya <code>updated_at &gt; since</code>.</p>
+        </div>
+      </div>
+
+      <div class="section-card p-3">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-2">Data Model</div>
+        <div class="md text-xs">
+          <pre>struct RemoteProduk {
+    id: String,
+    nama: String,
+    harga: i64,
+    updated_at: Option&lt;String&gt;,
+}</pre>
+        </div>
+      </div>
+
+      <div class="section-card p-3">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-2">Alur</div>
+        <div class="md text-xs">
+          <ul>
+            <li>First sync: <code>since=null</code> → full pull</li>
+            <li>Next: <code>since=last_sync_ts</code> → only changed</li>
+            <li>Retry 2× on fetch fail</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-card p-3">
+        <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-2">Pitfall</div>
+        <div class="md text-xs">
+          <ul>
+            <li>⚠ Ganti tenant → reset sync_produk_at</li>
+            <li>⚠ updated_at butuh DB trigger</li>
+          </ul>
+        </div>
+      </div>
+
+      <button class="w-full py-2 text-xs text-zinc-600 hover:text-zinc-300 border border-dashed border-zinc-800 rounded">
+        + Bagian Baru
+      </button>
+    </div>
+  </main>
+
+  <!-- Right: AI/API panel -->
+  <aside class="w-64 border-l border-zinc-800 bg-zinc-900 p-3 hidden lg:flex flex-col">
+    <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-2">AI Access</div>
+    <div class="space-y-2 text-[10px] mono text-zinc-500">
+      <div class="p-2 bg-zinc-950 border border-zinc-800 rounded">
+        <span class="text-emerald-400">GET</span> /api/bp/tree
+      </div>
+      <div class="p-2 bg-zinc-950 border border-zinc-800 rounded">
+        <span class="text-emerald-400">GET</span> /api/bp/incremental-sync
+      </div>
+      <div class="p-2 bg-zinc-950 border border-zinc-800 rounded">
+        <span class="text-blue-400">PUT</span> /api/bp/incremental-sync/bagian/2
+      </div>
+    </div>
+    <div class="mt-3 text-[10px] text-zinc-600">
+      <p>AI bisa baca semua bagian via JSON API. Edit langsung via PUT tanpa browser.</p>
+    </div>
+    <div class="mt-auto">
+      <div class="text-[10px] text-zinc-600 uppercase tracking-wide mb-1">Children</div>
+      <div class="text-xs text-zinc-500">
+        <div>↳ Retry & Cooldown</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

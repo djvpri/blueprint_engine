@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint Engine — Card Explorer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  .card { transition: transform 0.15s, box-shadow 0.15s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+  .child-chip { font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #f4f4f5; color: #71717a; }
+  .child-chip:hover { background: #e4e4e7; cursor: pointer; }
+  .md code { background: #f4f4f5; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+</style>
+</head>
+<body class="bg-zinc-50 text-zinc-900">
+
+<div class="max-w-6xl mx-auto p-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-bold">Blueprint Engine</h1>
+      <p class="text-sm text-zinc-500">Wiki aplikasi — human & AI readable</p>
+    </div>
+    <div class="flex gap-2">
+      <input type="text" placeholder="Cari..." class="px-3 py-1.5 text-sm bg-white border border-zinc-200 rounded-lg outline-none focus:border-zinc-400 w-48">
+      <button class="px-4 py-1.5 text-sm bg-zinc-900 text-white rounded-lg font-medium hover:bg-zinc-800">+ Baru</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex gap-2 mb-6">
+    <button class="badge bg-zinc-900 text-white">Semua</button>
+    <button class="badge bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300">Mobile</button>
+    <button class="badge bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300">Web</button>
+    <button class="badge bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300">Backend</button>
+    <button class="badge bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300">Library</button>
+  </div>
+
+  <!-- Blueprint cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    <!-- ZPos Kasir -->
+    <div class="card bg-white border border-zinc-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-medium">AKTIF</span>
+            <span class="text-[10px] text-zinc-400 mono">v0.1.134</span>
+          </div>
+          <h2 class="font-semibold text-base">ZPos Kasir</h2>
+          <p class="text-xs text-zinc-500 mt-0.5">Aplikasi kasir POS multi-tenant, Tauri + Rust</p>
+        </div>
+        <div class="flex gap-1">
+          <span class="badge bg-blue-50 text-blue-600">mobile</span>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-400 uppercase tracking-wide mb-1.5">Sub-blueprint</div>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <span class="child-chip">Sync Engine</span>
+        <span class="child-chip">Log Kasir</span>
+        <span class="child-chip">Struk Thermal</span>
+        <span class="child-chip">Multi-tenant Auth</span>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-zinc-100">
+        <span class="text-[10px] text-zinc-400">4 sub · 6 bagian</span>
+        <button class="text-xs text-zinc-600 hover:text-zinc-900">Buka →</button>
+      </div>
+    </div>
+
+    <!-- ZX Parenting -->
+    <div class="card bg-white border border-zinc-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-medium">AKTIF</span>
+            <span class="text-[10px] text-zinc-400 mono">v2.9.7</span>
+          </div>
+          <h2 class="font-semibold text-base">ZX Parenting</h2>
+          <p class="text-xs text-zinc-500 mt-0.5">App ortu pantau anak — tugas, reward, screen time</p>
+        </div>
+        <div class="flex gap-1">
+          <span class="badge bg-blue-50 text-blue-600">mobile</span>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-400 uppercase tracking-wide mb-1.5">Sub-blueprint</div>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <span class="child-chip">Auth Anak (PIN)</span>
+        <span class="child-chip">Tugas & Reward</span>
+        <span class="child-chip">Leaderboard</span>
+        <span class="child-chip">Screen Time</span>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-zinc-100">
+        <span class="text-[10px] text-zinc-400">4 sub · 8 bagian</span>
+        <button class="text-xs text-zinc-600 hover:text-zinc-900">Buka →</button>
+      </div>
+    </div>
+
+    <!-- ZGym -->
+    <div class="card bg-white border border-zinc-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">DRAFT</span>
+            <span class="text-[10px] text-zinc-400 mono">v1.2.0</span>
+          </div>
+          <h2 class="font-semibold text-base">ZGym</h2>
+          <p class="text-xs text-zinc-500 mt-0.5">Manajemen gym — member, kelas, pembayaran</p>
+        </div>
+        <div class="flex gap-1">
+          <span class="badge bg-blue-50 text-blue-600">web</span>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-400 uppercase tracking-wide mb-1.5">Sub-blueprint</div>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <span class="child-chip">Member Pricing</span>
+        <span class="child-chip">Kelas & Jadwal</span>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-zinc-100">
+        <span class="text-[10px] text-zinc-400">2 sub · 4 bagian</span>
+        <button class="text-xs text-zinc-600 hover:text-zinc-900">Buka →</button>
+      </div>
+    </div>
+
+    <!-- ZXRoom -->
+    <div class="card bg-white border border-zinc-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded-full font-medium">ARSIP</span>
+            <span class="text-[10px] text-zinc-400 mono">v0.8.3</span>
+          </div>
+          <h2 class="font-semibold text-base">ZXRoom</h2>
+          <p class="text-xs text-zinc-500 mt-0.5">Sistem reservasi & billing karaoke/homestay</p>
+        </div>
+        <div class="flex gap-1">
+          <span class="badge bg-blue-50 text-blue-600">web</span>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-400 uppercase tracking-wide mb-1.5">Sub-blueprint</div>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <span class="child-chip">Reservasi</span>
+        <span class="child-chip">Shift Kasir</span>
+        <span class="child-chip">Thermal Print</span>
+      </div>
+      <div class="flex justify-between items-center pt-2 border-t border-zinc-100">
+        <span class="text-[10px] text-zinc-400">3 sub · 5 bagian</span>
+        <button class="text-xs text-zinc-600 hover:text-zinc-900">Buka →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail preview: clicking a card opens this -->
+  <div class="mt-8 bg-white border border-zinc-200 rounded-xl p-6">
+    <div class="flex items-center gap-2 text-xs text-zinc-400 mb-4">
+      <span>ZPos Kasir</span>
+      <span>›</span>
+      <span>Sync Engine</span>
+      <span>›</span>
+      <span class="text-zinc-900 font-medium">Incremental Sync</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-4">
+      <h2 class="text-lg font-bold">Incremental Sync</h2>
+      <span class="badge bg-emerald-100 text-emerald-700">AKTIF</span>
+    </div>
+    <p class="text-sm text-zinc-500 mb-4">Sinkronisasi produk incremental — hanya download yang berubah sejak timestamp terakhir.</p>
+
+    <div class="space-y-4">
+      <div>
+        <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1">Ringkasan</h3>
+        <p class="text-sm text-zinc-600">Modul <code class="bg-zinc-100 px-1 rounded">sync.rs</code> handle sinkronisasi produk. Sebelumnya: download ALL 7505 produk. Sekarang: hanya <code class="bg-zinc-100 px-1 rounded">updated_at &gt; since</code>.</p>
+      </div>
+      <div>
+        <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1">Alur</h3>
+        <ul class="text-sm text-zinc-600 space-y-0.5 list-disc list-inside">
+          <li>First sync: full pull semua produk</li>
+          <li>Next: hanya yang updated_at &gt; since</li>
+          <li>Retry 2× on fetch fail</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1">Pitfall</h3>
+        <ul class="text-sm text-zinc-600 space-y-0.5 list-disc list-inside">
+          <li>⚠ Ganti tenant → reset sync_produk_at</li>
+          <li>⚠ updated_at butuh DB trigger</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-6 pt-4 border-t border-zinc-100">
+      <button class="px-3 py-1.5 text-sm bg-zinc-900 text-white rounded-lg font-medium">Edit</button>
+      <button class="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50">+ Sub-blueprint</button>
+      <button class="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50">+ Bagian</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
