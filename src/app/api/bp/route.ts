@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       deskripsi: deskripsi?.trim() || null,
       parentId: parentId || null,
       kategori: kategori || 'web',
-      tag: tag ? JSON.stringify(tag) : '[]',
+      tag: tag ? (typeof tag === 'string' ? tag : JSON.stringify(tag)) : '[]',
       status: status || 'draft',
       versi: versi || null,
       urut,

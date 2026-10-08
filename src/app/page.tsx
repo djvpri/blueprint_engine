@@ -48,7 +48,7 @@ export default async function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {roots.map((bp) => {
-          const tags: string[] = JSON.parse(bp.tag)
+          const tags: string[] = (() => { try { const t = JSON.parse(bp.tag); return Array.isArray(t) ? t : [] } catch { return [] } })()
           return (
             <Link
               key={bp.id}

@@ -28,19 +28,21 @@ export default async function BlueprintDetail({
 
   if (!bp) notFound()
 
-  const tags: string[] = JSON.parse(bp.tag)
+  const tags: string[] = (() => { try { const t = JSON.parse(bp.tag); return Array.isArray(t) ? t : [] } catch { return [] } })()
   // Build breadcrumb chain
   const breadcrumbs: { slug: string; judul: string }[] = []
-  let p = bp.parent
-  while (p) {
-    breadcrumbs.unshift(p)
-    const parent = await prisma.blueprint.findUnique({
-      where: { id: p.slug === bp.parent?.slug ? bp.parentId! : '' },
-      select: { parent: { select: { slug: true, judul: true } } },
+  let cur: { slug: string; judul: string; parentId: string | null } | null = bp.parent
+    ? { slug: bp.parent.slug, judul: bp.parent.judul, parentId: bp.parentId }
+    : null
+  while (cur) {
+    breadcrumbs.unshift({ slug: cur.slug, judul: cur.judul })
+    if (!cur.parentId) break
+    const up = await prisma.blueprint.findUnique({
+      where: { id: cur.parentId },
+      select: { slug: true, judul: true, parentId: true },
     })
-    p = parent?.parent ?? null
+    cur = up ? { slug: up.slug, judul: up.judul, parentId: up.parentId } : null
   }
-  if (bp.parent) breadcrumbs.unshift({ slug: bp.parent.slug, judul: bp.parent.judul })
 
   return (
     <div className="max-w-4xl mx-auto p-6">
