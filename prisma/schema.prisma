@@ -1,0 +1,41 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Blueprint {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  judul     String
+  deskripsi String?
+  parentId  String?  // null = root
+  parent    Blueprint? @relation("BlueprintTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Blueprint[] @relation("BlueprintTree")
+  urut      Int      @default(0)
+  kategori  String   @default("web") // web | mobile | backend | library
+  tag       String   @default("[]") // JSON array string
+  status    String   @default("draft") // draft | aktif | arsip
+  versi     String?
+  bagian    Bagian[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+model Bagian {
+  id          String   @id @default(cuid())
+  blueprintId String
+  blueprint   Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  judul       String
+  konten      String   @default("") // markdown
+  urut        Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([blueprintId, urut])
+}

@@ -1,0 +1,116 @@
+import { notFound } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import BagianEditor from './BagianEditor'
+
+export const instant = false
+
+const STATUS_COLOR: Record<string, string> = {
+  aktif: 'bg-emerald-100 text-emerald-700',
+  draft: 'bg-amber-100 text-amber-700',
+  arsip: 'bg-zinc-100 text-zinc-500',
+}
+
+export default async function BlueprintDetail({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const bp = await prisma.blueprint.findUnique({
+    where: { slug },
+    include: {
+      bagian: { orderBy: { urut: 'asc' } },
+      children: { select: { slug: true, judul: true, status: true }, orderBy: { urut: 'asc' } },
+      parent: { select: { slug: true, judul: true } },
+    },
+  })
+
+  if (!bp) notFound()
+
+  const tags: string[] = JSON.parse(bp.tag)
+  // Build breadcrumb chain
+  const breadcrumbs: { slug: string; judul: string }[] = []
+  let p = bp.parent
+  while (p) {
+    breadcrumbs.unshift(p)
+    const parent = await prisma.blueprint.findUnique({
+      where: { id: p.slug === bp.parent?.slug ? bp.parentId! : '' },
+      select: { parent: { select: { slug: true, judul: true } } },
+    })
+    p = parent?.parent ?? null
+  }
+  if (bp.parent) breadcrumbs.unshift({ slug: bp.parent.slug, judul: bp.parent.judul })
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-1 text-xs text-zinc-400 mb-4 flex-wrap">
+        <a href="/" className="hover:text-zinc-900">Home</a>
+        {breadcrumbs.map((b) => (
+          <span key={b.slug} className="flex items-center gap-1">
+            <span>›</span>
+            <a href={`/bp/${b.slug}`} className="hover:text-zinc-900">{b.judul}</a>
+          </span>
+        ))}
+        <span>›</span>
+        <span className="text-zinc-900 font-medium">{bp.judul}</span>
+      </div>
+
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[bp.status]}`}>
+              {bp.status.toUpperCase()}
+            </span>
+            {bp.versi && <span className="text-[10px] text-zinc-400 font-mono">{bp.versi}</span>}
+            {tags.map((t) => (
+              <span key={t} className="text-[10px] px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded-full">{t}</span>
+            ))}
+          </div>
+          <h1 className="text-2xl font-bold">{bp.judul}</h1>
+          {bp.deskripsi && <p className="text-sm text-zinc-500 mt-1">{bp.deskripsi}</p>}
+        </div>
+        <div className="flex gap-2">
+          <a
+            href={`/api/bp/${bp.slug}`}
+            className="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg hover:bg-zinc-50 font-mono"
+          >
+            JSON
+          </a>
+        </div>
+      </div>
+
+      {/* Sections */}
+      <div className="space-y-4 mb-6">
+        {bp.bagian.map((b) => (
+          <BagianEditor key={b.id} bagian={b} slug={bp.slug} />
+        ))}
+      </div>
+
+      {/* Add section */}
+      <button className="w-full py-2 text-sm text-zinc-400 hover:text-zinc-900 border border-dashed border-zinc-200 rounded-lg">
+        + Tambah Bagian
+      </button>
+
+      {/* Children */}
+      {bp.children.length > 0 && (
+        <div className="mt-8 pt-6 border-t border-zinc-200">
+          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">Sub-blueprint</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {bp.children.map((c) => (
+              <a
+                key={c.slug}
+                href={`/bp/${c.slug}`}
+                className="flex items-center justify-between px-3 py-2 bg-white border border-zinc-200 rounded-lg hover:border-zinc-300"
+              >
+                <span className="text-sm font-medium">{c.judul}</span>
+                <span className="text-xs text-zinc-400">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

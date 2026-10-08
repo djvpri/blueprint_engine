@@ -1,0 +1,12 @@
+node_modules/
+.next/
+prisma/dev.db
+prisma/dev.db-journal
+.env
+*.tsbuildinfo
+
+# Prisma generated skill dirs
+.agents/
+.claude/
+.cursor/
+.devin/
