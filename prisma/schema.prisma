@@ -20,6 +20,7 @@ model Blueprint {
   tag       String   @default("[]") // JSON array string
   status    String   @default("draft") // draft | aktif | arsip
   versi     String?
+  konsep    String   @default("") // ide/konsep blueprint (markdown)
   bagian    Bagian[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
+import KonsepEditor from './KonsepEditor'
 
 export const instant = false
 
@@ -84,6 +85,9 @@ export default async function BlueprintDetail({
           </a>
         </div>
       </div>
+
+      {/* Konsep / Ide */}
+      <KonsepEditor slug={bp.slug} initial={bp.konsep} />
 
       {/* Sections */}
       <div className="space-y-4 mb-6">
