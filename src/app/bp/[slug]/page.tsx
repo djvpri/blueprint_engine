@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
 import KonsepEditor from './KonsepEditor'
 import TambahBagian from './TambahBagian'
+import TambahSubBlueprint from './TambahSubBlueprint'
 
 // Cache Components: instant=false allows blocking render for dynamic data
 export const instant = false
@@ -119,6 +120,9 @@ export default async function BlueprintDetail({
           </div>
         </div>
       )}
+      <div className="mt-3">
+        <TambahSubBlueprint parentId={bp.id} />
+      </div>
     </div>
   )
 }

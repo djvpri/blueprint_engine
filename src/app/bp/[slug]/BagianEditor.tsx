@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface BagianData {
   id: string
@@ -10,11 +11,28 @@ interface BagianData {
 }
 
 export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slug: string }) {
+  const router = useRouter()
   const [editing, setEditing] = useState(false)
   const [judul, setJudul] = useState(bagian.judul)
   const [konten, setKonten] = useState(bagian.konten)
   const [saving, setSaving] = useState(false)
   const [pesan, setPesan] = useState<string | null>(null)
+  const [hapus, setHapus] = useState(false)
+
+  async function konfirmasiHapus() {
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/bp/${slug}/bagian/${bagian.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        router.refresh()
+      } else {
+        setPesan('Gagal hapus')
+      }
+    } catch {
+      setPesan('Error jaringan')
+    }
+    setSaving(false)
+  }
 
   async function simpan() {
     setSaving(true)
@@ -84,12 +102,37 @@ export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slu
           >
             Edit
           </button>
+          <button
+            onClick={() => setHapus(true)}
+            className="text-xs text-zinc-500 hover:text-red-600 px-2 py-0.5 rounded hover:bg-red-50"
+          >
+            Hapus
+          </button>
         </div>
       </div>
       <div className="prose prose-sm max-w-none text-zinc-600">
         <MarkdownPreview md={konten} />
       </div>
       {pesan && <p className="text-xs text-emerald-600 mt-2">{pesan}</p>}
+
+      {hapus && (
+        <div className="mt-3 flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <span className="text-sm text-red-700">Hapus bagian ini?</span>
+          <button
+            onClick={konfirmasiHapus}
+            disabled={saving}
+            className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50"
+          >
+            {saving ? 'Menghapus...' : 'Hapus'}
+          </button>
+          <button
+            onClick={() => setHapus(false)}
+            className="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg text-zinc-600 hover:bg-white"
+          >
+            Batal
+          </button>
+        </div>
+      )}
     </div>
   )
 }
