@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
 import KonsepEditor from './KonsepEditor'
+import TambahBagian from './TambahBagian'
 
 export const instant = false
 
@@ -97,9 +98,7 @@ export default async function BlueprintDetail({
       </div>
 
       {/* Add section */}
-      <button className="w-full py-2 text-sm text-zinc-400 hover:text-zinc-900 border border-dashed border-zinc-200 rounded-lg">
-        + Tambah Bagian
-      </button>
+      <TambahBagian slug={bp.slug} />
 
       {/* Children */}
       {bp.children.length > 0 && (
