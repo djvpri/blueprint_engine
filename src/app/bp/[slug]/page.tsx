@@ -5,7 +5,8 @@ import BagianEditor from './BagianEditor'
 import KonsepEditor from './KonsepEditor'
 import TambahBagian from './TambahBagian'
 
-export const dynamic = 'force-dynamic'
+// Cache Components: instant=false allows blocking render for dynamic data
+export const instant = false
 
 const STATUS_COLOR: Record<string, string> = {
   aktif: 'bg-emerald-100 text-emerald-700',
