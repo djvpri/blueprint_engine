@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tugas Module — Scheduler Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #0f0f12; color: #e4e4e7; }
+  .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; }
+  .accent { color: #f59e0b; }
+  .accent-bg { background: #f59e0b; }
+  .accent-border { border-color: #f59e0b; }
+  .toggle { width: 36px; height: 20px; border-radius: 10px; background: #3f3f46; position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle.on { background: #f59e0b; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: transform 0.2s; }
+  .toggle.on::after { transform: translateX(16px); }
+  .slider-track { height: 6px; border-radius: 3px; background: #27272a; position: relative; }
+  .slider-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #22c55e, #eab308, #ef4444); }
+  .slider-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; border: 2px solid #f59e0b; position: absolute; top: -6px; transform: translateX(-50%); cursor: grab; }
+  .day-btn { width: 32px; height: 32px; border-radius: 8px; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+  .day-btn.off { background: #27272a; color: #71717a; }
+  .day-btn.on { background: #f59e0b; color: #0f0f12; }
+  .badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="flex h-screen">
+
+  <!-- Sidebar -->
+  <div class="w-56 border-r border-zinc-800 flex flex-col">
+    <div class="px-4 py-4 border-b border-zinc-800">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg accent-bg flex items-center justify-center text-black font-bold text-sm">ZX</div>
+        <span class="font-bold text-sm">Parenting</span>
+      </div>
+    </div>
+    <nav class="flex-1 px-2 py-3 space-y-1">
+      <a class="block px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800">Beranda</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800">Anak</a>
+      <a class="block px-3 py-2 rounded-lg text-sm bg-amber-500/10 accent font-semibold">Tugas</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800">Aturan</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800">Laporan</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800">Profil</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-zinc-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold">B</div>
+        <div class="text-xs">
+          <div class="font-semibold">Budi</div>
+          <div class="text-zinc-500">Elite</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="max-w-3xl mx-auto px-6 py-6 space-y-5">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold">Tugas & Kuis</h1>
+          <p class="text-xs text-zinc-500 mt-0.5">Kelola tugas manual, AI quiz, dan jadwal AI otomatis</p>
+        </div>
+        <button class="px-3 py-2 accent-bg text-black rounded-lg text-sm font-semibold">+ Tugas Baru</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 border-b border-zinc-800">
+        <button class="px-3 py-2 text-sm text-zinc-500 border-b-2 border-transparent">Manual</button>
+        <button class="px-3 py-2 text-sm text-zinc-500 border-b-2 border-transparent">AI Quiz</button>
+        <button class="px-3 py-2 text-sm font-semibold accent border-b-2 accent-border">Jadwal AI</button>
+      </div>
+
+      <!-- Scheduled AI cards -->
+      <div class="space-y-3">
+
+        <!-- Card 1: Active -->
+        <div class="card p-4">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-sm">Matematika Dasar</span>
+                  <span class="badge bg-amber-500/15 accent">AKTIF</span>
+                </div>
+                <div class="text-xs text-zinc-500 mt-0.5">Untuk: Sari (8 thn) · Setiap Senin-Jumat · 15:00</div>
+              </div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 text-xs">
+            <div class="bg-zinc-900 rounded-lg p-2">
+              <div class="text-zinc-500">Kesulitan</div>
+              <div class="font-semibold mt-0.5">Level 3 / 5</div>
+            </div>
+            <div class="bg-zinc-900 rounded-lg p-2">
+              <div class="text-zinc-500">Reward</div>
+              <div class="font-semibold mt-0.5 text-green-400">10 Token</div>
+            </div>
+            <div class="bg-zinc-900 rounded-lg p-2">
+              <div class="text-zinc-500">Terakhir</div>
+              <div class="font-semibold mt-0.5">Hari ini 15:00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Inactive -->
+        <div class="card p-4 opacity-60">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-sm">Kosakata Bahasa</span>
+                  <span class="badge bg-zinc-700 text-zinc-400">PAUSED</span>
+                </div>
+                <div class="text-xs text-zinc-500 mt-0.5">Untuk: Sari (8 thn) · Sabtu-Minggu · 09:00</div>
+              </div>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- New Schedule Form (expanded) -->
+      <div class="card p-5 border-dashed border-zinc-700">
+        <h2 class="font-semibold text-sm mb-4 flex items-center gap-2">
+          <span class="accent">+</span> Buat Jadwal AI Baru
+        </h2>
+
+        <div class="space-y-4">
+
+          <!-- Anak -->
+          <div>
+            <label class="text-xs text-zinc-500 font-medium">Anak</label>
+            <div class="flex gap-2 mt-1.5">
+              <button class="px-3 py-1.5 rounded-lg text-sm bg-amber-500/15 accent font-medium border accent-border">Sari</button>
+              <button class="px-3 py-1.5 rounded-lg text-sm bg-zinc-900 text-zinc-400 border border-zinc-800">Andi</button>
+            </div>
+          </div>
+
+          <!-- Tema -->
+          <div>
+            <label class="text-xs text-zinc-500 font-medium">Tema / Topik</label>
+            <input type="text" value="Matematika Dasar" class="w-full mt-1.5 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500" />
+          </div>
+
+          <!-- Kesulitan slider -->
+          <div>
+            <div class="flex justify-between items-center">
+              <label class="text-xs text-zinc-500 font-medium">Tingkat Kesulitan</label>
+              <span class="text-sm font-bold accent">Level 3</span>
+            </div>
+            <div class="mt-3 relative">
+              <div class="slider-track">
+                <div class="slider-fill" style="width: 50%"></div>
+              </div>
+              <div class="slider-thumb" style="left: 50%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-zinc-600 mt-1.5">
+              <span>Pemula</span><span>Mudah</span><span>Sedang</span><span>Sulit</span><span>Expert</span>
+            </div>
+          </div>
+
+          <!-- Jam -->
+          <div>
+            <label class="text-xs text-zinc-500 font-medium">Jam Kirim</label>
+            <div class="flex items-center gap-2 mt-1.5">
+              <input type="time" value="15:00" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500" />
+              <span class="text-xs text-zinc-500">WIB</span>
+            </div>
+          </div>
+
+          <!-- Hari aktif -->
+          <div>
+            <label class="text-xs text-zinc-500 font-medium">Hari Aktif</label>
+            <div class="flex gap-1.5 mt-1.5">
+              <div class="day-btn on">Sen</div>
+              <div class="day-btn on">Sel</div>
+              <div class="day-btn on">Rab</div>
+              <div class="day-btn on">Kam</div>
+              <div class="day-btn on">Jum</div>
+<div class="day-btn off">Sab</div>
+              <div class="day-btn off">Min</div>
+            </div>
+          </div>
+
+          <!-- Reward -->
+          <div>
+            <label class="text-xs text-zinc-500 font-medium">Reward Token</label>
+            <div class="flex items-center gap-3 mt-1.5">
+              <input type="range" min="1" max="50" value="10" class="flex-1 accent-amber-500" />
+              <span class="text-sm font-bold text-green-400 w-16 text-right">10 Token</span>
+            </div>
+          </div>
+
+          <!-- Auto-approve -->
+          <div class="flex items-center justify-between bg-zinc-900 rounded-lg p-3">
+            <div>
+              <div class="text-sm font-medium">Auto-Approve</div>
+              <div class="text-xs text-zinc-500 mt-0.5">Lewati approval ortu, token langsung masuk</div>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2 pt-1">
+            <button class="flex-1 py-2.5 accent-bg text-black rounded-lg text-sm font-semibold">Buat Jadwal</button>
+            <button class="px-4 py-2.5 border border-zinc-800 rounded-lg text-sm text-zinc-400">Batal</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="bg-blue-500/5 border border-blue-500/15 rounded-lg p-3 flex gap-3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" class="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <p class="text-xs text-blue-300">Jadwal AI mengenerate tugas otomatis via Gemini 2.5 Flash. Tugas masuk ke app anak tanpa ortu klik manual. Token tetap butuh approval (kecuali auto-approve aktif). Tier Elite = unlimited jadwal.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

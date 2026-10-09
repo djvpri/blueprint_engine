@@ -143,17 +143,25 @@ function MarkdownPreview({ md }: { md: string }) {
 }
 
 function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/(`[^`]+`)/)
-  return parts.map((p, i) => {
-    if (p.startsWith('`') && p.endsWith('`')) {
-      return <code key={i} className="bg-amber-100 px-1 rounded text-xs font-mono text-amber-800">{p.slice(1, -1)}</code>
+  // [text](url) → <a>, then `code`, then **bold**
+  const linkParts = text.split(/(\[[^\]]+\]\([^)]+\))/)
+  return linkParts.map((lp, i) => {
+    const linkMatch = lp.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+    if (linkMatch) {
+      return <a key={`lk-${i}`} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="text-amber-600 underline hover:text-amber-800 font-medium">{linkMatch[1]}</a>
     }
-    const boldParts = p.split(/(\*\*[^*]+\*\*)/)
-    return boldParts.map((bp, j) => {
-      if (bp.startsWith('**') && bp.endsWith('**')) {
-        return <strong key={`${i}-${j}`}>{bp.slice(2, -2)}</strong>
+    const parts = lp.split(/(`[^`]+`)/)
+    return parts.map((p, j) => {
+      if (p.startsWith('`') && p.endsWith('`')) {
+        return <code key={`${i}-${j}`} className="bg-amber-100 px-1 rounded text-xs font-mono text-amber-800">{p.slice(1, -1)}</code>
       }
-      return <span key={`${i}-${j}`}>{bp}</span>
+      const boldParts = p.split(/(\*\*[^*]+\*\*)/)
+      return boldParts.map((bp, k) => {
+        if (bp.startsWith('**') && bp.endsWith('**')) {
+          return <strong key={`${i}-${j}-${k}`}>{bp.slice(2, -2)}</strong>
+        }
+        return <span key={`${i}-${j}-${k}`}>{bp}</span>
+      })
     })
   })
 }

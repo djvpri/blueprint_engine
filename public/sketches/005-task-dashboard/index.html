@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tugas Module — Task Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #f8fafc; color: #1e293b; }
+  .card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; }
+  .badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 6px; }
+  .checkbox { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 6px; flex-shrink: 0; cursor: pointer; transition: all 0.15s; }
+  .checkbox.checked { background: #6366f1; border-color: #6366f1; position: relative; }
+  .checkbox.checked::after { content: '✓'; position: absolute; top: -1px; left: 3px; color: white; font-size: 13px; font-weight: bold; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="flex h-screen">
+
+  <!-- Sidebar -->
+  <div class="w-56 bg-white border-r border-slate-200 flex flex-col">
+    <div class="px-4 py-4 border-b border-slate-200">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">ZX</div>
+        <span class="font-bold text-sm">Parenting</span>
+      </div>
+    </div>
+    <nav class="flex-1 px-2 py-3 space-y-1">
+      <a class="block px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100">Beranda</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100">Anak</a>
+      <a class="block px-3 py-2 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-semibold">Tugas</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100">Aturan</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100">Laporan</a>
+      <a class="block px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100">Profil</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-slate-200">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold">B</div>
+        <div class="text-xs">
+          <div class="font-semibold">Budi</div>
+          <div class="text-slate-400">Elite</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="flex-1 flex">
+
+    <!-- Task list -->
+    <div class="w-96 border-r border-slate-200 overflow-y-auto">
+      <div class="px-5 py-4 border-b border-slate-200">
+        <h1 class="text-lg font-bold">Tugas</h1>
+        <div class="flex gap-2 mt-2">
+          <button class="px-2.5 py-1 rounded-md text-xs bg-indigo-600 text-white font-medium">Semua</button>
+          <button class="px-2.5 py-1 rounded-md text-xs text-slate-500 hover:bg-slate-100">Manual</button>
+          <button class="px-2.5 py-1 rounded-md text-xs text-slate-500 hover:bg-slate-100">AI Quiz</button>
+          <button class="px-2.5 py-1 rounded-md text-xs text-slate-500 hover:bg-slate-100">Jadwal AI</button>
+        </div>
+      </div>
+
+      <div class="px-3 py-2 space-y-1.5">
+
+        <!-- Task: AI Scheduled -->
+        <div class="card p-3 border-l-4 border-l-amber-400">
+          <div class="flex items-start gap-3">
+            <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="badge bg-amber-100 text-amber-700">AI SCHEDULED</span>
+                <span class="text-[10px] text-slate-400">15:00</span>
+              </div>
+              <div class="text-sm font-semibold">Kuis Penjumlahan Level 3</div>
+              <div class="text-xs text-slate-500 mt-0.5">Sari · 5 soal · Reward: 10 token</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task: Manual, pending -->
+        <div class="card p-3">
+          <div class="flex items-start gap-3">
+            <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="badge bg-slate-100 text-slate-600">MANUAL</span>
+                <span class="text-[10px] text-slate-400">menunggu</span>
+              </div>
+              <div class="text-sm font-semibold">Bantu bersih-bersih kamar</div>
+              <div class="text-xs text-slate-500 mt-0.5">Andi · Reward: 5 token</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task: AI Quiz, done -->
+        <div class="card p-3 opacity-50">
+          <div class="flex items-start gap-3">
+            <div class="checkbox checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="badge bg-green-100 text-green-700">AI QUIZ</span>
+                <span class="text-[10px] text-green-600">selesai ✓</span>
+              </div>
+              <div class="text-sm font-semibold line-through">Tebak Nama Hewan</div>
+              <div class="text-xs text-slate-500 mt-0.5">Sari · Reward: 8 token diklaim</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task: AI Scheduled, pending approval -->
+        <div class="card p-3 border-l-4 border-l-blue-400">
+          <div class="flex items-start gap-3">
+            <div class="checkbox checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="badge bg-amber-100 text-amber-700">AI SCHEDULED</span>
+                <span class="badge bg-blue-100 text-blue-700">PERLU APPROVE</span>
+              </div>
+              <div class="text-sm font-semibold">Soal Cerita Matematika</div>
+              <div class="text-xs text-slate-500 mt-0.5">Sari · Anak selesai kerjakan · 10 token</div>
+              <div class="flex gap-1.5 mt-2">
+                <button class="px-2 py-1 rounded-md text-xs bg-green-600 text-white font-medium">Approve</button>
+                <button class="px-2 py-1 rounded-md text-xs border border-slate-200 text-slate-500">Tolak</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task: Manual, done -->
+        <div class="card p-3 opacity-50">
+          <div class="flex items-start gap-3">
+            <div class="checkbox checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="badge bg-slate-100 text-slate-600">MANUAL</span>
+                <span class="text-[10px] text-green-600">selesai ✓</span>
+              </div>
+              <div class="text-sm font-semibold line-through">Baca buku 30 menit</div>
+              <div class="text-xs text-slate-500 mt-0.5">Sari · 5 token diklaim</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- New jadwal CTA -->
+      <div class="px-3 py-3">
+        <button class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-sm text-slate-400 hover:border-indigo-400 hover:text-indigo-600 font-medium">
+          + Buat Jadwal AI
+        </button>
+      </div>
+    </div>
+
+    <!-- Detail pane -->
+    <div class="flex-1 overflow-y-auto bg-slate-50">
+      <div class="max-w-2xl mx-auto px-6 py-6">
+
+        <!-- Selected task detail -->
+        <div class="card p-5 mb-4">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="badge bg-amber-100 text-amber-700">AI SCHEDULED</span>
+            <span class="badge bg-blue-100 text-blue-700">PERLU APPROVE</span>
+            <span class="text-xs text-slate-400 ml-auto">Hari ini 15:00 WIB</span>
+          </div>
+          <h2 class="text-lg font-bold mb-1">Soal Cerita Matematika</h2>
+          <p class="text-sm text-slate-500 mb-4">Dibuat oleh Gemini 2.5 Flash · Kesulitan Level 3 · Tema: Matematika Dasar</p>
+
+          <!-- Anak info -->
+          <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3 mb-4">
+            <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600">S</div>
+            <div>
+              <div class="text-sm font-semibold">Sari</div>
+              <div class="text-xs text-slate-400">8 tahun · Kelas 2 SD</div>
+            </div>
+          </div>
+
+          <!-- Soal preview -->
+          <div class="space-y-3 mb-4">
+            <div class="font-semibold text-sm">Preview Soal:</div>
+
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-sm mb-2">1. Sari punya 12 permen. Dia memberi 4 permen kepada Andi. Berapa permen Sari sekarang?</p>
+              <div class="grid grid-cols-4 gap-2">
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">6</div>
+                <div class="border border-green-500 bg-green-50 rounded-lg p-2 text-center text-sm font-bold text-green-700">8 ✓</div>
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">7</div>
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">9</div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-sm mb-2">2. Di kelas ada 20 murid. 7 murid pergi ke perpustakaan. Berapa murid di kelas?</p>
+              <div class="grid grid-cols-4 gap-2">
+                <div class="border border-green-500 bg-green-50 rounded-lg p-2 text-center text-sm font-bold text-green-700">13 ✓</div>
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">12</div>
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">14</div>
+                <div class="border border-slate-200 rounded-lg p-2 text-center text-sm cursor-pointer hover:border-indigo-400">15</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reward + approve -->
+          <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+            <div class="text-sm">
+              <span class="text-slate-400">Reward:</span>
+              <span class="font-bold text-green-600">10 Token</span>
+            </div>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-500">Tolak</button>
+              <button class="px-4 py-1.5 bg-green-600 text-white rounded-lg text-sm font-semibold">Approve & Kirim Token</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scheduler mini-panel -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-sm">Jadwal AI Aktif</h3>
+            <button class="text-xs text-indigo-600 font-medium">Kelola</button>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between bg-amber-50 rounded-lg p-2.5">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                <span class="text-sm">Matematika Dasar</span>
+              </div>
+              <span class="text-xs text-slate-400">Sen-Jum 15:00</span>
+            </div>
+            <div class="flex items-center justify-between bg-slate-50 rounded-lg p-2.5 opacity-50">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+                <span class="text-sm">Kosakata Bahasa</span>
+              </div>
+              <span class="text-xs text-slate-400">Sab-Min 09:00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
