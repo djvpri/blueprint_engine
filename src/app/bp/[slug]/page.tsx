@@ -5,7 +5,7 @@ import BagianEditor from './BagianEditor'
 import KonsepEditor from './KonsepEditor'
 import TambahBagian from './TambahBagian'
 
-export const instant = false
+export const dynamic = 'force-dynamic'
 
 const STATUS_COLOR: Record<string, string> = {
   aktif: 'bg-emerald-100 text-emerald-700',
