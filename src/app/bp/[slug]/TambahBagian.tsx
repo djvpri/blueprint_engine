@@ -7,10 +7,11 @@ export default function TambahBagian({ slug }: { slug: string }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showInput, setShowInput] = useState(false)
+  const [judul, setJudul] = useState('')
 
   async function tambah() {
-    const judul = prompt('Judul bagian baru:')
-    if (!judul?.trim()) return
+    if (!judul.trim()) return
     setLoading(true)
     setError(null)
     try {
@@ -20,6 +21,8 @@ export default function TambahBagian({ slug }: { slug: string }) {
         body: JSON.stringify({ judul: judul.trim(), konten: '' }),
       })
       if (res.ok) {
+        setJudul('')
+        setShowInput(false)
         router.refresh()
       } else {
         setError('Gagal tambah bagian')
@@ -30,16 +33,43 @@ export default function TambahBagian({ slug }: { slug: string }) {
     setLoading(false)
   }
 
+  if (showInput) {
+    return (
+      <div className="w-full p-3 border border-dashed border-zinc-300 rounded-lg bg-zinc-50">
+        <input
+          autoFocus
+          value={judul}
+          onChange={(e) => setJudul(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') tambah(); if (e.key === 'Escape') { setShowInput(false); setJudul('') } }}
+          placeholder="Judul bagian baru..."
+          className="w-full text-sm px-3 py-2 border border-zinc-200 rounded-lg outline-none focus:border-zinc-400 bg-white"
+        />
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={tambah}
+            disabled={loading || !judul.trim()}
+            className="px-3 py-1.5 text-sm bg-zinc-900 text-white rounded-lg font-medium hover:bg-zinc-800 disabled:opacity-50"
+          >
+            {loading ? 'Menambah...' : 'Tambah'}
+          </button>
+          <button
+            onClick={() => { setShowInput(false); setJudul('') }}
+            className="px-3 py-1.5 text-sm border border-zinc-200 rounded-lg text-zinc-600 hover:bg-white"
+          >
+            Batal
+          </button>
+          {error && <span className="text-xs text-red-500 self-center">{error}</span>}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <button
-        onClick={tambah}
-        disabled={loading}
-        className="w-full py-2 text-sm text-zinc-400 hover:text-zinc-900 border border-dashed border-zinc-200 rounded-lg disabled:opacity-50"
-      >
-        {loading ? 'Menambah...' : '+ Tambah Bagian'}
-      </button>
-      {error && <p className="text-xs text-red-500 mt-1 text-center">{error}</p>}
-    </div>
+    <button
+      onClick={() => setShowInput(true)}
+      className="w-full py-2 text-sm text-zinc-400 hover:text-zinc-900 border border-dashed border-zinc-200 rounded-lg"
+    >
+      + Tambah Bagian
+    </button>
   )
 }
