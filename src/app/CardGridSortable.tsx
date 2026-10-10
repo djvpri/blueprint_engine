@@ -35,13 +35,25 @@ function DraggableCard({ bp }: { bp: CardData }) {
     <div
       ref={setNodeRef}
       {...attributes}
-      className={`bg-white border rounded-xl p-4 transition-all ${
+      className={`relative bg-white border rounded-xl p-4 transition-all ${
         isDragging ? 'opacity-40 border-blue-400 shadow-lg' : 'border-zinc-200 hover:shadow-md hover:-translate-y-0.5'
       }`}
     >
-      {/* Drag handle — full card draggable */}
-      <div {...listeners} className="cursor-grab active:cursor-grabbing">
-        <div className="flex items-start justify-between mb-2">
+      {/* Drag handle — small icon, only this triggers drag */}
+      <button
+        {...listeners}
+        className="absolute top-3 right-3 cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-600 touch-none p-1 z-10"
+        aria-label="Drag to move"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 2a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zM12 2a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2z"/>
+        </svg>
+      </button>
+
+      {/* Entire card is a link */}
+      <Link href={`/bp/${bp.slug}`} className="block">
+        <div className="flex items-start justify-between mb-2 pr-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[bp.status] || STATUS_COLOR.draft}`}>
@@ -52,7 +64,6 @@ function DraggableCard({ bp }: { bp: CardData }) {
             <h2 className="font-semibold text-base">{bp.judul}</h2>
             <p className="text-xs text-zinc-500 mt-0.5">{bp.deskripsi}</p>
           </div>
-          <span className="text-[10px] px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">{bp.kategori}</span>
         </div>
 
         {bp.children.length > 0 && (
@@ -71,13 +82,12 @@ function DraggableCard({ bp }: { bp: CardData }) {
             <span key={t} className="text-[10px] px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded-full">{t}</span>
           ))}
         </div>
-      </div>
 
-      {/* Footer — not draggable, clickable */}
-      <div className="flex justify-between items-center pt-2 border-t border-zinc-100">
-        <span className="text-[10px] text-zinc-400">{bp.children.length} sub · {bp._count.bagian} bagian</span>
-        <Link href={`/bp/${bp.slug}`} className="text-xs text-zinc-600 hover:text-blue-600">Buka →</Link>
-      </div>
+        <div className="flex justify-between items-center pt-2 border-t border-zinc-100">
+          <span className="text-[10px] text-zinc-400">{bp.children.length} sub · {bp._count.bagian} bagian</span>
+          <span className="text-xs text-zinc-600">Buka →</span>
+        </div>
+      </Link>
     </div>
   )
 }
@@ -113,9 +123,6 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
 
     setSaving(true)
     try {
-      // PATCH langsung update parentId — gunakan endpoint reorder generik
-      // Target blueprint slug perlu diresolve — pakai PATCH /api/bp/[slug] tidak ada parentId update
-      // Gunakan endpoint baru: PATCH /api/bp/reparent
       const res = await fetch('/api/bp/reparent', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
