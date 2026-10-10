@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
+import HapusBlueprint from './HapusBlueprint'
 import KonsepEditor from './KonsepEditor'
 import TambahBagian from './TambahBagian'
 import TambahSubBlueprint from './TambahSubBlueprint'
@@ -96,6 +97,7 @@ export default async function BlueprintDetail({
           >
             JSON
           </a>
+          <HapusBlueprint slug={bp.slug} judul={bp.judul} />
         </div>
       </div>
 
