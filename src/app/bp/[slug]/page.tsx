@@ -5,6 +5,7 @@ import BagianEditor from './BagianEditor'
 import KonsepEditor from './KonsepEditor'
 import TambahBagian from './TambahBagian'
 import TambahSubBlueprint from './TambahSubBlueprint'
+import TreeSortable from './TreeSortable'
 
 // Cache Components: instant=false allows blocking render for dynamic data
 export const instant = false
@@ -25,7 +26,16 @@ export default async function BlueprintDetail({
     where: { slug },
     include: {
       bagian: { orderBy: { urut: 'asc' } },
-      children: { select: { slug: true, judul: true, status: true }, orderBy: { urut: 'asc' } },
+      children: {
+        select: { id: true, slug: true, judul: true, status: true, urut: true,
+          children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
+            children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
+              children: { select: { id: true, slug: true, judul: true, status: true, urut: true } }
+            } }
+          } }
+        },
+        orderBy: { urut: 'asc' },
+      },
       parent: { select: { slug: true, judul: true } },
     },
   })
@@ -102,22 +112,11 @@ export default async function BlueprintDetail({
       {/* Add section */}
       <TambahBagian slug={bp.slug} />
 
-      {/* Children */}
+      {/* Children — drag & drop sortable tree */}
       {bp.children.length > 0 && (
         <div className="mt-8 pt-6 border-t border-zinc-200">
           <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">Sub-blueprint</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {bp.children.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/bp/${c.slug}`}
-                className="flex items-center justify-between px-3 py-2 bg-white border border-zinc-200 rounded-lg hover:border-zinc-300"
-              >
-                <span className="text-sm font-medium">{c.judul}</span>
-                <span className="text-xs text-zinc-400">→</span>
-              </Link>
-            ))}
-          </div>
+          <TreeSortable initialTree={bp.children} slug={bp.slug} />
         </div>
       )}
       <div className="mt-3">
