@@ -32,13 +32,18 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   const [menuId, setMenuId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  // Tutup dropdown saat klik luar
+  // Tutup dropdown saat klik luar — pakai click, bukan mousedown
+  // mousedown trigger terlalu cepat → tutup dropdown sebelum klik item sampai
   useEffect(() => {
+    if (!menuId) return
     const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuId(null)
+      const target = e.target as HTMLElement
+      // Jangan tutup kalau klik di dalam menu atau tombol menu
+      if (target.closest('[data-menu-container]')) return
+      setMenuId(null)
     }
-    if (menuId) document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
   }, [menuId])
 
   const reparent = useCallback(async (draggedId: string, targetId: string | null) => {
@@ -135,7 +140,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                 </div>
 
                 {/* Tombol ⋮ — menu pindah */}
-                <div className="absolute top-3 right-3" ref={menuId === bp.id ? menuRef : undefined}>
+                <div className="absolute top-3 right-3" data-menu-container ref={menuId === bp.id ? menuRef : undefined}>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('[MENU] klik ⋮', { bpId: bp.id, judul: bp.judul, menuId }); setMenuId(menuId === bp.id ? null : bp.id) }}
                     className="text-zinc-400 hover:text-zinc-700 p-1 rounded hover:bg-zinc-100"
