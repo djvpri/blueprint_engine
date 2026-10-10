@@ -42,17 +42,33 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   }, [menuId])
 
   const reparent = useCallback(async (draggedId: string, targetId: string | null) => {
-    if (draggedId === targetId) return
+    console.log('[REPARENT] start', { draggedId, targetId })
+    if (draggedId === targetId) {
+      console.log('[REPARENT] skip — same id')
+      return
+    }
     setSaving(true)
     try {
+      console.log('[REPARENT] fetching...', { url: '/api/bp/reparent', body: { id: draggedId, parentId: targetId } })
       const res = await fetch('/api/bp/reparent', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: draggedId, parentId: targetId }),
       })
-      if (res.ok) router.refresh()
+      console.log('[REPARENT] response', { status: res.status, ok: res.ok })
+      const data = await res.json().catch(() => null)
+      console.log('[REPARENT] body', data)
+      if (res.ok) {
+        console.log('[REPARENT] router.refresh()')
+        router.refresh()
+      } else {
+        console.error('[REPARENT] FAILED', { status: res.status, data })
+      }
+    } catch (err) {
+      console.error('[REPARENT] ERROR', err)
     } finally {
       setSaving(false)
+      console.log('[REPARENT] done')
     }
   }, [router])
 
@@ -121,7 +137,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                 {/* Tombol ⋮ — menu pindah */}
                 <div className="absolute top-3 right-3" ref={menuId === bp.id ? menuRef : undefined}>
                   <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuId(menuId === bp.id ? null : bp.id) }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('[MENU] klik ⋮', { bpId: bp.id, judul: bp.judul, menuId }); setMenuId(menuId === bp.id ? null : bp.id) }}
                     className="text-zinc-400 hover:text-zinc-700 p-1 rounded hover:bg-zinc-100"
                     aria-label="Menu"
                   >
@@ -135,7 +151,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                         Pindah ke...
                       </div>
                       <button
-                        onClick={() => { reparent(bp.id, null); setMenuId(null) }}
+                        onClick={() => { console.log('[MENU] pilih Root', { draggedId: bp.id }); reparent(bp.id, null); setMenuId(null) }}
                         className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-50"
                       >
                         🏠 Root (top level)
@@ -143,7 +159,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                       {cards.filter(c => c.id !== bp.id).map(c => (
                         <button
                           key={c.id}
-                          onClick={() => { reparent(bp.id, c.id); setMenuId(null) }}
+                          onClick={() => { console.log('[MENU] pilih target', { draggedId: bp.id, targetId: c.id, targetJudul: c.judul }); reparent(bp.id, c.id); setMenuId(null) }}
                           className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-50 truncate"
                         >
                           {c.judul}
