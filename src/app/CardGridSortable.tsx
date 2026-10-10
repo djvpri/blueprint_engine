@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -29,6 +29,32 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   const [dragId, setDragId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [menuId, setMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Tutup dropdown saat klik luar
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuId(null)
+    }
+    if (menuId) document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuId])
+
+  const reparent = useCallback(async (draggedId: string, targetId: string | null) => {
+    if (draggedId === targetId) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/bp/reparent', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: draggedId, parentId: targetId }),
+      })
+      if (res.ok) router.refresh()
+    } finally {
+      setSaving(false)
+    }
+  }, [router])
 
   const handleDragStart = useCallback((e: React.DragEvent, id: string) => {
     e.dataTransfer.setData('text/plain', id)
@@ -42,29 +68,14 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
     setOverId(id)
   }, [])
 
-  const handleDragLeave = useCallback(() => {
-    setOverId(null)
-  }, [])
-
-  const handleDrop = useCallback(async (e: React.DragEvent, targetId: string) => {
+  const handleDrop = useCallback((e: React.DragEvent, targetId: string) => {
     e.preventDefault()
     const draggedId = e.dataTransfer.getData('text/plain')
     setDragId(null)
     setOverId(null)
     if (!draggedId || draggedId === targetId) return
-
-    setSaving(true)
-    try {
-      const res = await fetch('/api/bp/reparent', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: draggedId, parentId: targetId }),
-      })
-      if (res.ok) router.refresh()
-    } finally {
-      setSaving(false)
-    }
-  }, [router])
+    reparent(draggedId, targetId)
+  }, [reparent])
 
   return (
     <div>
@@ -82,41 +93,68 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
             <div
               key={bp.id}
               onDragOver={(e) => handleDragOver(e, bp.id)}
-              onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, bp.id)}
               className={`rounded-xl transition-all ${isOver ? 'ring-2 ring-blue-500 ring-offset-2 scale-[1.02]' : ''} ${isDragged ? 'opacity-30' : ''}`}
             >
               <div
-                className={`relative bg-white border rounded-xl p-4 transition-all ${
+                className={`relative bg-white border rounded-xl overflow-hidden transition-all ${
                   isDragged ? 'border-blue-400' : 'border-zinc-200 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                {/* Drag handle */}
+                {/* HEADER — draggable area besar */}
                 <div
                   draggable
                   onDragStart={(e) => handleDragStart(e, bp.id)}
-                  className="absolute top-3 right-3 cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-600 p-1 z-10"
-                  title="Drag ke card lain untuk jadi sub-blueprint"
+                  onDragEnd={() => { setDragId(null); setOverId(null) }}
+                  className="px-4 pt-4 pb-2 cursor-grab active:cursor-grabbing select-none"
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M4 2a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zM12 2a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2zm0 4a1 1 0 110 2 1 1 0 010-2z"/>
-                  </svg>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[bp.status] || STATUS_COLOR.draft}`}>
+                      {bp.status.toUpperCase()}
+                    </span>
+                    {bp.versi && <span className="text-[10px] text-zinc-400 font-mono">{bp.versi}</span>}
+                  </div>
+                  <h2 className="font-semibold text-base">{bp.judul}</h2>
+                  <p className="text-xs text-zinc-500 mt-0.5">{bp.deskripsi}</p>
                 </div>
 
-                <Link href={`/bp/${bp.slug}`} className="block">
-                  <div className="flex items-start justify-between mb-2 pr-8">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[bp.status] || STATUS_COLOR.draft}`}>
-                          {bp.status.toUpperCase()}
-                        </span>
-                        {bp.versi && <span className="text-[10px] text-zinc-400 font-mono">{bp.versi}</span>}
+                {/* Tombol ⋮ — menu pindah */}
+                <div className="absolute top-3 right-3" ref={menuId === bp.id ? menuRef : undefined}>
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuId(menuId === bp.id ? null : bp.id) }}
+                    className="text-zinc-400 hover:text-zinc-700 p-1 rounded hover:bg-zinc-100"
+                    aria-label="Menu"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 5.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 5.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
+                    </svg>
+                  </button>
+                  {menuId === bp.id && (
+                    <div className="absolute right-0 mt-1 w-56 bg-white border border-zinc-200 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto">
+                      <div className="px-3 py-1.5 text-[10px] text-zinc-400 uppercase tracking-wide border-b border-zinc-100">
+                        Pindah ke...
                       </div>
-                      <h2 className="font-semibold text-base">{bp.judul}</h2>
-                      <p className="text-xs text-zinc-500 mt-0.5">{bp.deskripsi}</p>
+                      <button
+                        onClick={() => { reparent(bp.id, null); setMenuId(null) }}
+                        className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-50"
+                      >
+                        🏠 Root (top level)
+                      </button>
+                      {cards.filter(c => c.id !== bp.id).map(c => (
+                        <button
+                          key={c.id}
+                          onClick={() => { reparent(bp.id, c.id); setMenuId(null) }}
+                          className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-50 truncate"
+                        >
+                          {c.judul}
+                        </button>
+                      ))}
                     </div>
-                  </div>
+                  )}
+                </div>
 
+                {/* BODY — Link, tidak draggable */}
+                <Link href={`/bp/${bp.slug}`} className="block px-4 pb-4" draggable={false}>
                   {bp.children.length > 0 && (
                     <>
                       <div className="text-[10px] text-zinc-400 uppercase tracking-wide mb-1.5">Sub-blueprint</div>
