@@ -106,8 +106,8 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
               className={`rounded-xl transition-all ${isOver ? 'ring-2 ring-blue-500 ring-offset-2 scale-[1.02]' : ''} ${isDragged ? 'opacity-30' : ''}`}
             >
               <div
-                className={`relative bg-white border rounded-xl overflow-hidden transition-all ${
-                  isDragged ? 'border-blue-400' : 'border-zinc-200 hover:shadow-md hover:-translate-y-0.5'
+                className={`relative bg-white border rounded-xl transition-all ${
+                  isDragged ? 'border-blue-400' : 'border-zinc-200 hover:shadow-md'
                 }`}
               >
                 {/* HEADER — draggable area besar */}
