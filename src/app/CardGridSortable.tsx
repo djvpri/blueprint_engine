@@ -126,7 +126,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   const [saving, setSaving] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor)
   )
 
   const handleDragStart = useCallback((e: DragStartEvent) => {
