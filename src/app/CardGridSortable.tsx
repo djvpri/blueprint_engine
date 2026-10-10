@@ -25,7 +25,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function CardGridSortable({ initialCards }: { initialCards: CardData[] }) {
   const router = useRouter()
-  const [cards] = useState(initialCards)
+  const [cards, setCards] = useState(initialCards)
   const [dragId, setDragId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -53,6 +53,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
       console.log('[REPARENT] body', data)
       if (res.ok) {
         console.log('[REPARENT] router.refresh()')
+        setCards(prev => prev.filter(c => c.id !== draggedId))
         router.refresh()
       } else {
         console.error('[REPARENT] FAILED', { status: res.status, data })
