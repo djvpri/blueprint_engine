@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -30,21 +30,9 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   const [overId, setOverId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [menuId, setMenuId] = useState<string | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
 
-  // Tutup dropdown saat klik luar — pakai click, bukan mousedown
-  // mousedown trigger terlalu cepat → tutup dropdown sebelum klik item sampai
-  useEffect(() => {
-    if (!menuId) return
-    const handler = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      // Jangan tutup kalau klik di dalam menu atau tombol menu
-      if (target.closest('[data-menu-container]')) return
-      setMenuId(null)
-    }
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
-  }, [menuId])
+  // Tanpa useEffect — dropdown tutup via stopPropagation + klik item set menuId=null
+  // Klik luar: backdrop transparent full-screen z-40, klik = tutup
 
   const reparent = useCallback(async (draggedId: string, targetId: string | null) => {
     console.log('[REPARENT] start', { draggedId, targetId })
@@ -140,7 +128,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                 </div>
 
                 {/* Tombol ⋮ — menu pindah */}
-                <div className="absolute top-3 right-3" data-menu-container ref={menuId === bp.id ? menuRef : undefined}>
+                <div className="absolute top-3 right-3" data-menu-container>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('[MENU] klik ⋮', { bpId: bp.id, judul: bp.judul, menuId }); setMenuId(menuId === bp.id ? null : bp.id) }}
                     className="text-zinc-400 hover:text-zinc-700 p-1 rounded hover:bg-zinc-100"
@@ -151,7 +139,13 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                     </svg>
                   </button>
                   {menuId === bp.id && (
-                    <div className="absolute right-0 mt-1 w-56 bg-white border border-zinc-200 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto">
+                    <>
+                      {/* Backdrop — klik luar tutup dropdown */}
+                      <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuId(null) }} />
+                      <div
+                        className="absolute right-0 mt-1 w-56 bg-white border border-zinc-200 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                       <div className="px-3 py-1.5 text-[10px] text-zinc-400 uppercase tracking-wide border-b border-zinc-100">
                         Pindah ke...
                       </div>
@@ -171,6 +165,7 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                         </button>
                       ))}
                     </div>
+                    </>
                   )}
                 </div>
 
