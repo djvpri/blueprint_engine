@@ -44,7 +44,7 @@ export async function POST(
     const filepath = path.join(dir, filename)
     await writeFile(filepath, Buffer.from(await file.arrayBuffer()))
 
-    item = { id: crypto.randomBytes(8).toString('hex'), tipe: 'gambar', url: `/uploads/bp/${slug}/${filename}`, label }
+    item = { id: crypto.randomBytes(8).toString('hex'), tipe: 'gambar', url: `/api/uploads/bp/${slug}/${filename}`, label }
   } else {
     // Link addition
     const { url, label } = await req.json()
@@ -97,10 +97,10 @@ export async function DELETE(
   if (!item) return NextResponse.json({ error: 'Media tidak ditemukan' }, { status: 404 })
 
   // Hapus file kalau gambar lokal
-  if (item.tipe === 'gambar' && item.url.startsWith('/uploads/')) {
+  if (item.tipe === 'gambar' && item.url.startsWith('/api/uploads/')) {
     try {
       const fs = await import('fs/promises')
-      await fs.unlink(path.join(process.cwd(), 'public', item.url))
+      await fs.unlink(path.join(process.cwd(), 'public', 'uploads', item.url.replace('/api/uploads/', '')))
     } catch { /* file mungkin sudah tidak ada */ }
   }
 
