@@ -224,13 +224,16 @@ export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slu
           <div className="space-y-2 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
             {/* Upload gambar */}
             <div className="flex items-center gap-2">
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGambar(f) }}
-                disabled={uploading}
-                className="text-xs"
-              />
+              <label className="px-3 py-1.5 text-xs bg-zinc-900 text-white rounded-lg font-medium hover:bg-zinc-800 cursor-pointer disabled:opacity-50 whitespace-nowrap">
+                {uploading ? 'Uploading...' : '📁 Pilih Gambar'}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGambar(f) }}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </label>
               <input
                 value={uploadLabel}
                 onChange={(e) => setUploadLabel(e.target.value)}
