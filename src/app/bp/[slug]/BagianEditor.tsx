@@ -3,11 +3,19 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface MediaItem {
+  id: string
+  tipe: 'gambar' | 'link'
+  url: string
+  label?: string
+}
+
 interface BagianData {
   id: string
   judul: string
   konten: string
   urut: number
+  media?: string // JSON string
 }
 
 export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slug: string }) {
@@ -18,6 +26,14 @@ export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slu
   const [saving, setSaving] = useState(false)
   const [pesan, setPesan] = useState<string | null>(null)
   const [hapus, setHapus] = useState(false)
+
+  // Media state
+  const mediaItems: MediaItem[] = (() => { try { return JSON.parse(bagian.media || '[]') } catch { return [] } })()
+  const [showMedia, setShowMedia] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+  const [linkLabel, setLinkLabel] = useState('')
+  const [uploadLabel, setUploadLabel] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   async function konfirmasiHapus() {
     setSaving(true)
@@ -54,6 +70,60 @@ export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slu
       setPesan('Error jaringan')
     }
     setSaving(false)
+  }
+
+  async function uploadGambar(file: File) {
+    setUploading(true)
+    setPesan(null)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      if (uploadLabel.trim()) form.append('label', uploadLabel.trim())
+      const res = await fetch(`/api/bp/${slug}/bagian/${bagian.id}/media`, { method: 'POST', body: form })
+      if (res.ok) {
+        setUploadLabel('')
+        router.refresh()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        setPesan(err.error || 'Gagal upload')
+      }
+    } catch {
+      setPesan('Error jaringan')
+    }
+    setUploading(false)
+  }
+
+  async function tambahLink() {
+    if (!linkUrl.trim()) return
+    setUploading(true)
+    setPesan(null)
+    try {
+      const res = await fetch(`/api/bp/${slug}/bagian/${bagian.id}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: linkUrl.trim(), label: linkLabel.trim() }),
+      })
+      if (res.ok) {
+        setLinkUrl('')
+        setLinkLabel('')
+        router.refresh()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        setPesan(err.error || 'Gagal tambah link')
+      }
+    } catch {
+      setPesan('Error jaringan')
+    }
+    setUploading(false)
+  }
+
+  async function hapusMedia(mediaId: string) {
+    try {
+      const res = await fetch(`/api/bp/${slug}/bagian/${bagian.id}/media?mediaId=${mediaId}`, { method: 'DELETE' })
+      if (res.ok) router.refresh()
+    } catch {
+      setPesan('Error jaringan')
+    }
   }
 
   if (editing) {
@@ -113,6 +183,91 @@ export default function BagianEditor({ bagian, slug }: { bagian: BagianData; slu
       <div className="prose prose-sm max-w-none text-zinc-600">
         <MarkdownPreview md={konten} />
       </div>
+
+      {/* Media gallery */}
+      {mediaItems.length > 0 && (
+        <div className="mt-3 space-y-2">
+          {mediaItems.map((m) => (
+            <div key={m.id} className="relative group/media">
+              {m.tipe === 'gambar' ? (
+                <div className="relative">
+                  <img src={m.url} alt={m.label || ''} className="rounded-lg border border-zinc-200 max-w-full" />
+                  {m.label && <p className="text-xs text-zinc-500 mt-1">{m.label}</p>}
+                </div>
+              ) : (
+                <a href={m.url} target="_blank" rel="noopener noreferrer"
+                   className="inline-flex items-center gap-2 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-blue-600 hover:bg-zinc-100">
+                  <span>🔗</span>
+                  <span>{m.label || m.url}</span>
+                </a>
+              )}
+              <button
+                onClick={() => hapusMedia(m.id)}
+                className="absolute top-1 right-1 opacity-0 group-hover/media:opacity-100 transition bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                title="Hapus media"
+              >×</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Media controls */}
+      <div className="mt-2">
+        {!showMedia ? (
+          <button
+            onClick={() => setShowMedia(true)}
+            className="text-xs text-zinc-500 hover:text-zinc-900 px-2 py-0.5 rounded hover:bg-zinc-100"
+          >
+            + Tambah gambar/link
+          </button>
+        ) : (
+          <div className="space-y-2 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+            {/* Upload gambar */}
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGambar(f) }}
+                disabled={uploading}
+                className="text-xs"
+              />
+              <input
+                value={uploadLabel}
+                onChange={(e) => setUploadLabel(e.target.value)}
+                placeholder="Label gambar (opsional)"
+                className="flex-1 text-xs border border-zinc-200 rounded px-2 py-1 bg-white"
+              />
+            </div>
+            {/* Divider */}
+            <div className="border-t border-zinc-200" />
+            {/* Input link */}
+            <div className="flex items-center gap-2">
+              <input
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://..."
+                className="flex-1 text-xs border border-zinc-200 rounded px-2 py-1 bg-white"
+              />
+              <input
+                value={linkLabel}
+                onChange={(e) => setLinkLabel(e.target.value)}
+                placeholder="Label link"
+                className="w-32 text-xs border border-zinc-200 rounded px-2 py-1 bg-white"
+              />
+              <button
+                onClick={tambahLink}
+                disabled={uploading || !linkUrl.trim()}
+                className="px-2 py-1 text-xs bg-zinc-900 text-white rounded hover:bg-zinc-800 disabled:opacity-50"
+              >Tambah</button>
+            </div>
+            <button
+              onClick={() => setShowMedia(false)}
+              className="text-xs text-zinc-500 hover:text-zinc-900"
+            >Tutup</button>
+          </div>
+        )}
+      </div>
+
       {pesan && <p className="text-xs text-emerald-600 mt-2">{pesan}</p>}
 
       {hapus && (

@@ -10,3 +10,6 @@ prisma/dev.db-journal
 .claude/
 .cursor/
 .devin/
+
+# Uploaded media (stored on VPS, not in git)
+public/uploads/

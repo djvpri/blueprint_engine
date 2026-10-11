@@ -34,6 +34,7 @@ model Bagian {
   blueprint   Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
   judul       String
   konten      String   @default("") // markdown
+  media       String   @default("[]") // JSON array: [{id, tipe:"gambar"|"link", url, label}]
   urut        Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
