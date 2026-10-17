@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import CardGridSortable, { type CardData } from './CardGridSortable'
+import CreateBlueprintButton from './CreateBlueprintButton'
 
 export const instant = false
 
@@ -21,9 +22,7 @@ export default async function Home() {
           <p className="text-sm text-zinc-500">Wiki aplikasi — human &amp; AI readable</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-1.5 text-sm bg-zinc-900 text-white rounded-lg font-medium hover:bg-zinc-800">
-            + Baru
-          </button>
+          <CreateBlueprintButton />
         </div>
       </div>
 
