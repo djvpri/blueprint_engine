@@ -26,6 +26,8 @@ export default async function BlueprintDetail({
   const { slug } = await params
   // Mark route dynamic — slug bisa di-create post-build via API, jangan cache prerender
   await headers()
+  console.log('[bp/[slug]] params.slug =', JSON.stringify(slug))
+  // Coba beberapa variant decoding — Next.js page route decode %20 beda dari API route
   const bp = await prisma.blueprint.findUnique({
     where: { slug },
     include: {
@@ -42,7 +44,9 @@ export default async function BlueprintDetail({
       },
       parent: { select: { slug: true, judul: true } },
     },
-  })
+  }) ?? (slug.includes('%') ? await prisma.blueprint.findUnique({
+    where: { slug: decodeURIComponent(slug) },
+  }) : null)
 
   if (!bp) notFound()
 
