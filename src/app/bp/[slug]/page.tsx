@@ -46,6 +46,20 @@ export default async function BlueprintDetail({
     },
   }) ?? (slug.includes('%') ? await prisma.blueprint.findUnique({
     where: { slug: decodeURIComponent(slug) },
+    include: {
+      bagian: { orderBy: { urut: 'asc' } },
+      children: {
+        select: { id: true, slug: true, judul: true, status: true, urut: true,
+          children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
+            children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
+              children: { select: { id: true, slug: true, judul: true, status: true, urut: true } }
+            } }
+          } }
+        },
+        orderBy: { urut: 'asc' },
+      },
+      parent: { select: { slug: true, judul: true } },
+    },
   }) : null)
 
   if (!bp) notFound()
