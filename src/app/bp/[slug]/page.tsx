@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { notFound, connection } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
 import HapusBlueprint from './HapusBlueprint'
@@ -24,7 +25,7 @@ export default async function BlueprintDetail({
 }) {
   const { slug } = await params
   // Mark route dynamic — slug bisa di-create post-build via API, jangan cache prerender
-  await connection()
+  await headers()
   const bp = await prisma.blueprint.findUnique({
     where: { slug },
     include: {
