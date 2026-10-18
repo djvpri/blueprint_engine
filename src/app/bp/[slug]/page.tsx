@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, connection } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import BagianEditor from './BagianEditor'
 import HapusBlueprint from './HapusBlueprint'
@@ -10,8 +10,6 @@ import TreeSortable from './TreeSortable'
 
 // Cache Components: instant=false allows blocking render for dynamic data
 export const instant = false
-// Slug bisa di-create post-build via API → bypass static prerender cache
-export const dynamic = 'force-dynamic'
 
 const STATUS_COLOR: Record<string, string> = {
   aktif: 'bg-emerald-100 text-emerald-700',
@@ -25,6 +23,8 @@ export default async function BlueprintDetail({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  // Mark route dynamic — slug bisa di-create post-build via API, jangan cache prerender
+  await connection()
   const bp = await prisma.blueprint.findUnique({
     where: { slug },
     include: {
