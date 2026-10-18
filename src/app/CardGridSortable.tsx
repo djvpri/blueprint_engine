@@ -30,9 +30,29 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
   const [overId, setOverId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [menuId, setMenuId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Tanpa useEffect — dropdown tutup via stopPropagation + klik item set menuId=null
   // Klik luar: backdrop transparent full-screen z-40, klik = tutup
+
+  const hapus = useCallback(async (bp: CardData) => {
+    if (!confirm(`Hapus "${bp.judul}"? Termasuk semua sub-blueprint & bagian di dalamnya. Tidak bisa dibatalkan.`)) return
+    setMenuId(null)
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/bp/${encodeURIComponent(bp.slug)}`, { method: 'DELETE' })
+      if (res.ok) {
+        setCards(prev => prev.filter(c => c.id !== bp.id))
+        router.refresh()
+      } else {
+        alert('Gagal hapus: HTTP ' + res.status)
+      }
+    } catch (e) {
+      alert('Gagal hapus: ' + (e as Error).message)
+    } finally {
+      setDeleting(false)
+    }
+  }, [router])
 
   const reparent = useCallback(async (draggedId: string, targetId: string | null) => {
     console.log('[REPARENT] start', { draggedId, targetId })
@@ -92,6 +112,11 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
       {saving && (
         <div className="fixed top-4 right-4 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg z-50">
           Menyimpan...
+        </div>
+      )}
+      {deleting && (
+        <div className="fixed top-4 right-4 bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg z-50">
+          Menghapus...
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -165,6 +190,13 @@ export default function CardGridSortable({ initialCards }: { initialCards: CardD
                           {c.judul}
                         </button>
                       ))}
+                      <div className="border-t border-zinc-100 my-1" />
+                      <button
+                        onClick={() => hapus(bp)}
+                        className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 font-medium"
+                      >
+                        🗑 Hapus Blueprint
+                      </button>
                     </div>
                     </>
                   )}
