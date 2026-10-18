@@ -26,10 +26,10 @@ export default async function BlueprintDetail({
   const { slug } = await params
   // Mark route dynamic — slug bisa di-create post-build via API, jangan cache prerender
   await headers()
-  console.log('[bp/[slug]] params.slug =', JSON.stringify(slug))
-  // Coba beberapa variant decoding — Next.js page route decode %20 beda dari API route
+  // Next.js 16 page route terima slug literal (encoded %20), decode untuk match DB
+  const dbSlug = slug.includes('%') ? decodeURIComponent(slug) : slug
   const bp = await prisma.blueprint.findUnique({
-    where: { slug },
+    where: { slug: dbSlug },
     include: {
       bagian: { orderBy: { urut: 'asc' } },
       children: {
@@ -44,23 +44,7 @@ export default async function BlueprintDetail({
       },
       parent: { select: { slug: true, judul: true } },
     },
-  }) ?? (slug.includes('%') ? await prisma.blueprint.findUnique({
-    where: { slug: decodeURIComponent(slug) },
-    include: {
-      bagian: { orderBy: { urut: 'asc' } },
-      children: {
-        select: { id: true, slug: true, judul: true, status: true, urut: true,
-          children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
-            children: { select: { id: true, slug: true, judul: true, status: true, urut: true,
-              children: { select: { id: true, slug: true, judul: true, status: true, urut: true } }
-            } }
-          } }
-        },
-        orderBy: { urut: 'asc' },
-      },
-      parent: { select: { slug: true, judul: true } },
-    },
-  }) : null)
+  })
 
   if (!bp) notFound()
 
