@@ -10,6 +10,8 @@ import TreeSortable from './TreeSortable'
 
 // Cache Components: instant=false allows blocking render for dynamic data
 export const instant = false
+// Slug bisa di-create post-build via API → bypass static prerender cache
+export const dynamic = 'force-dynamic'
 
 const STATUS_COLOR: Record<string, string> = {
   aktif: 'bg-emerald-100 text-emerald-700',
