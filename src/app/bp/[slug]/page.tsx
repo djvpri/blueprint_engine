@@ -106,6 +106,29 @@ export default async function BlueprintDetail({
         </div>
       </div>
 
+      {/* Mockup link — khusus blueprint yang punya mockup variant */}
+      {bp.slug === 'pajak kendaraan kalbar' && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">Mockup Variant</h3>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="http://znoe26p91zqfvljnrenjb0ml.103.93.129.94.sslip.io/mockup/admin-v1-clean/index.html"
+              target="_blank"
+              className="px-3 py-1.5 text-xs bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 font-medium"
+            >
+              Admin v1 Clean →
+            </a>
+            <a
+              href="http://znoe26p91zqfvljnrenjb0ml.103.93.129.94.sslip.io/mockup/001-clean-minimal/index.html"
+              target="_blank"
+              className="px-3 py-1.5 text-xs bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 font-medium"
+            >
+              001 Clean Minimal →
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Konsep / Ide */}
       <KonsepEditor slug={bp.slug} initial={bp.konsep} />
 
